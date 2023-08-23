@@ -1,0 +1,287 @@
+from kivy.app import App
+from kivy.uix.screenmanager import Screen
+from kivy.uix.popup import Popup
+from kivy.lang import Builder
+from kivy.clock import Clock
+import time
+import pickle
+import datetime
+
+
+
+disciplinas = [
+    "FUNDAMENTOS_DE_REDES_DE_COMPUTADORES",
+    "INTRODUCAO_A_PROGRAMACAO_ESTRUTURADA_EM_C",
+    "INTRODUCAO_A_SEGURANCA_DA_INFORMACAO",
+    "ORGANIZACAO_E_ARQUITETURA_DE_COMPUTADORES",
+    "LINGUA_PORTUGUESA",
+    "BANCO_DE_DADOS",
+    "COMPUTACAO_EM_NUVEM_E_WEB_SERVICES_EM_LINUX",
+    "DESENVOLV._WEB_EM_HTML5_CSS_JAVASCRIPT_E_PHP",
+    "PENSAMENTO_COMPUTACIONAL",
+    "PARADIGMAS_DE_LING._DE_PROGRAMACAO_EM_PYTHON",
+    "DESENHO_E_FORMATACAO_DE_NEGOCIOS_DIGITAIS",
+    "DESENVOLVIMENTO_RAPIDO_DE_APLICACOES_EM_PYTHON",
+    "ENGENHARIA_DE_SOFTWARE",
+    "ESTRUTURA_DE_DADOS_EM_C",
+    "PROGRAMACAO_CLIENTE_SERVIDOR",
+    "WEB_DESIGN",
+    "MARKETING_DIGITAL_E_MIDIAS_SOCIAIS",
+    "HISTORIA_DOS_POVOS_INDIGENAS_E_AFRODESCENDENTES",
+    "COMPLEXIDADE_DE_ALGORITMOS",
+    "MATEMATICA_E_LOGICA",
+    "MODELAGEM_DE_SISTEMAS_COM_UML",
+    "PROGRAMACAO_ORIENTADA_A_OBJETOS_EM_JAVA",
+    "SISTEMAS_DISTRIBUIDOS_E_COMPUTACAO_PARALELA",
+    "DIREITO_CIBERNETICO",
+    "PADROES_DE_PROJETO_DE_SOFTWARE_COM_JAVA",
+    "PROGRAMACAO_PARA_DISPOSITIVOS_MOVEIS_EM_ANDROID",
+    "TOPICOS_DE_BIG_DATA_EM_PYTHON",
+    "TOPICOS_DE_CLOUD_IOT_E_INDUSTRIA_4.0_EM_PYTHON",
+    "NEGOCIOS_ELETRONICOS",
+    "PROGRAMACAO_EM_C++",
+]
+
+class Rotina(Popup):
+    texto_popup = ""
+
+class ShowTime(Popup):
+    pass
+
+class Materiaescolhida(Screen):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.materia = ""
+        self.started = False
+        self.start_time = 0
+        self.total_times = self.load_total_times()
+
+    def load_total_times(self):
+        total_times = {}
+        for disciplina in disciplinas:
+            try:
+                with open(f"{disciplina}_total_time.pkl", "rb") as file:
+                    total_times[disciplina] = pickle.load(file)
+            except (FileNotFoundError, pickle.UnpicklingError):
+                total_times[disciplina] = 0
+        return total_times
+            
+    def save_total_times(self):
+        for disciplina, total_time in self.total_times.items():
+            with open(f"{disciplina}_total_time.pkl", "wb") as file:
+                pickle.dump(total_time, file)
+
+    def start_stop_timer(self):
+        if not self.started:
+            self.start_time = time.time()
+            self.started = True
+            self.schedule_interval = Clock.schedule_interval(self.update_timer, 1)
+
+        else:
+            self.total_times[self.materia] += time.time() - self.start_time
+            self.started = False
+            self.save_total_times()
+            self.update_button_text()
+            Clock.unschedule(self.schedule_interval)
+
+    def update_timer(self,dt):
+        self.total_times[self.materia] += dt
+        self.update_button_text()
+
+    def update_button_text(self):
+        if not self.started:
+            self.ids.start_stop_button.text = "Iniciar"
+        else:
+            self.ids.start_stop_button.text = "Parar"
+    
+    def show_total_time(self):
+        total_hours = self.total_times[self.materia] / 3600  
+        remaining_hours = max(88 - total_hours, 0)
+        todas = self.calculate_all_subjects_total()
+        progress = (todas / 9720000 ) * 100 
+        todas_hours = todas / 3600     
+        popup = ShowTime()
+        popup.ids.Dados.text = f'Tempo total estudado: {total_hours:.2f} horas\nHoras restantes: {remaining_hours:.2f} horas\nTodas matérias: {todas_hours:.2f} horas\nProgresso: {progress:.2f}%'
+        popup.open()
+
+    def calculate_all_subjects_total(self):
+        all_subjects_total = 0
+        for disciplina in disciplinas:
+            try:
+                with open(f"{disciplina}_total_time.pkl", "rb") as file:
+                    all_subjects_total += pickle.load(file)
+            except (FileNotFoundError, pickle.UnpicklingError):
+                pass
+        return all_subjects_total
+
+class TelaInicial(Screen):
+    disciplinas = [
+    "FUNDAMENTOS_DE_REDES_DE_COMPUTADORES",
+    "INTRODUCAO_A_PROGRAMACAO_ESTRUTURADA_EM_C",
+    "INTRODUCAO_A_SEGURANCA_DA_INFORMACAO",
+    "ORGANIZACAO_E_ARQUITETURA_DE_COMPUTADORES",
+    "LINGUA_PORTUGUESA",
+    "BANCO_DE_DADOS",
+    "COMPUTACAO_EM_NUVEM_E_WEB_SERVICES_EM_LINUX",
+    "DESENVOLV._WEB_EM_HTML5_CSS_JAVASCRIPT_E_PHP",
+    "PENSAMENTO_COMPUTACIONAL",
+    "PARADIGMAS_DE_LING._DE_PROGRAMACAO_EM_PYTHON",
+    "DESENHO_E_FORMATACAO_DE_NEGOCIOS_DIGITAIS",
+    "DESENVOLVIMENTO_RAPIDO_DE_APLICACOES_EM_PYTHON",
+    "ENGENHARIA_DE_SOFTWARE",
+    "ESTRUTURA_DE_DADOS_EM_C",
+    "PROGRAMACAO_CLIENTE_SERVIDOR",
+    "WEB_DESIGN",
+    "MARKETING_DIGITAL_E_MIDIAS_SOCIAIS",
+    "HISTORIA_DOS_POVOS_INDIGENAS_E_AFRODESCENDENTES",
+    "COMPLEXIDADE_DE_ALGORITMOS",
+    "MATEMATICA_E_LOGICA",
+    "MODELAGEM_DE_SISTEMAS_COM_UML",
+    "PROGRAMACAO_ORIENTADA_A_OBJETOS_EM_JAVA",
+    "SISTEMAS_DISTRIBUIDOS_E_COMPUTACAO_PARALELA",
+    "DIREITO_CIBERNETICO",
+    "PADROES_DE_PROJETO_DE_SOFTWARE_COM_JAVA",
+    "PROGRAMACAO_PARA_DISPOSITIVOS_MOVEIS_EM_ANDROID",
+    "TOPICOS_DE_BIG_DATA_EM_PYTHON",
+    "TOPICOS_DE_CLOUD_IOT_E_INDUSTRIA_4.0_EM_PYTHON",
+    "NEGOCIOS_ELETRONICOS",
+    "PROGRAMACAO_EM_C++",
+]
+    def verrotina(self):
+        popup = Rotina()
+        dia = datetime.datetime.now().weekday()
+        print(dia)
+        if dia == 0:
+            popup.texto_popup = 'computação em nuvem até 16:00 javascript até 22:00'
+        elif dia == 1:
+            popup.texto_popup = 'javascript até 16:00 e redes até 22:00'
+        elif dia == 2:
+            popup.texto_popup = 'desenvolvimento rápido em python até 16:00 e c++ até 22:00'
+        elif dia == 3:
+            popup.texto_popup = 'banco de dados até 16:00 e segurança da informação até 22:00'
+        elif dia == 4:
+            popup.texto_popup = 'pensamento computacional até 16:00 e arquitetura de pc até 22:00'
+        elif dia == 5:
+            popup.texto_popup = 'revisão'
+        elif dia == 6:
+            popup.texto_popup = 'livre'
+        popup.ids.semana.text = popup.texto_popup
+        popup.open()
+
+    def on_spinner_select(self, spinner):
+        selected_subject = spinner
+        app = App.get_running_app()
+        materia_escolhida_screen = app.root.get_screen('materia escolhida')
+        materia_escolhida_screen.materia = selected_subject
+
+        materia_escolhida_screen.total_times = materia_escolhida_screen.load_total_times() or 0
+
+        app.root.get_screen('materia escolhida').ids.materia_esc.text = f'Matéria escolhida: {selected_subject}'
+        app.root.current = 'materia escolhida'
+             
+class FaculdadeApp(App):
+    def build(self):
+        return Builder.load_string("""
+
+#:import hex kivy.utils.get_color_from_hex
+#:import NoTransition kivy.uix.screenmanager.NoTransition   
+                                   
+ScreenManager:
+    transition: NoTransition()
+    TelaInicial:
+    Materiaescolhida:
+
+<Rotina>:
+    size_hint_x: 0.6
+    size_hint_y: 0.6
+    title: 'materia do dia'
+
+    Label:
+        text: root.texto_popup
+        id: semana
+        
+<ShowTime>:
+    spacing: 23 
+    padding: 23
+    title: 'dados'
+    size_hint: None, None
+    size: 400, 400
+    auto_dismiss: False
+    BoxLayout:
+        orientation: 'vertical'
+        Label:
+            text: ''
+            id: Dados
+        
+        Button:
+            text: 'Fechar'
+            on_release: root.dismiss()
+            size_hint_y: 0.2     
+                                                             
+<TelaInicial>:
+    canvas.before:
+        Color:
+            rgba: hex("#2e0da6")
+        Rectangle:
+            size: self.size
+            pos: self.pos
+    name: "tela inicial"
+    BoxLayout:
+        orientation: 'vertical'
+        Widget: 
+            size_hint_y: None
+        
+        Widget: 
+            size_hint_y: None
+
+        Spinner:
+            text: "Selecione a matéria"
+            values: root.disciplinas
+            size_hint: None, None
+            size: 400, 44
+            pos_hint: {'center_x': 0.5,'center_y': 0.5}
+            on_text: root.on_spinner_select(self.text)
+        Label:
+            text: ''
+        Label:
+            text: ''              
+        Button:
+            text: 'ver rotina'
+            size: 400,44
+            on_release: root.verrotina()
+                          
+<Materiaescolhida>:
+    canvas.before:
+        Color:
+            rgba: hex("#2e0da6")
+        Rectangle:
+            size: self.size
+            pos: self.pos
+    name: "materia escolhida"
+    BoxLayout:
+        orientation: 'vertical'
+        spacing: 10  
+        padding: 10  
+        Label:
+            text:''
+            id: materia_esc
+            size_hint_y: 4.5
+   
+        Button:
+            text: 'iniciar'
+            on_release: root.start_stop_timer()
+            id: start_stop_button
+            size: 150,44                                  
+        Button:
+            text: 'informações'
+            on_release: root.show_total_time()
+            size: 150,44
+        Button:
+            text: 'voltar'
+            on_release: app.root.current = "tela inicial"
+            size: 150,44
+                                      
+""")
+
+if __name__ == '__main__':
+    FaculdadeApp().run()
