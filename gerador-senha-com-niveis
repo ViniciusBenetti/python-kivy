@@ -1,0 +1,121 @@
+from kivy.app import App
+from kivy.uix.popup import Popup 
+from easy_password_generator import PassGen
+from kivy.uix.boxlayout import BoxLayout
+from kivy.lang import Builder
+
+class Mostrarsenha(Popup):
+    def senha1(self):
+        pwo = PassGen(minlen=4, maxlen=5)      
+        self.ids.senha.text = pwo.generate()
+    def senha2(self):
+        pwo = PassGen(minlen=7, maxlen=8)    
+        self.ids.senha.text = pwo.generate()
+    def senha3(self):
+        pwo = PassGen(minlen=10, maxlen=11)   
+        self.ids.senha.text = pwo.generate()
+    def senha4(self):
+        pwo = PassGen(minlen=13, maxlen=14)   
+        self.ids.senha.text = pwo.generate()
+    def senha5(self):
+        pwo = PassGen(minlen=15, maxlen=16)   
+        self.ids.senha.text = pwo.generate()
+        
+class Tela(BoxLayout):
+    def gerarum(self):
+        popup = Mostrarsenha()
+        popup.senha1()
+        popup.open()
+    def gerardois(self):
+        popup = Mostrarsenha()
+        popup.senha2()
+        popup.open()
+    def gerartres(self):
+        popup = Mostrarsenha()
+        popup.senha3()
+        popup.open()
+    def gerarquatro(self):
+        popup = Mostrarsenha()
+        popup.senha4()
+        popup.open()
+    def gerarcinco(self):
+        popup = Mostrarsenha()
+        popup.senha5()
+        popup.open()
+
+kv = Builder.load_string(
+"""#:import hex kivy.utils.get_color_from_hex
+
+<Mostrarsenha>:
+    title: 'senha gerada'
+    size: 400,200
+
+    BoxLayout:
+        orientation: 'vertical'
+        Label:
+            text: ''
+            id: senha
+        Button:
+            text: 'voltar'
+            size_hint_y: .3
+            on_release: root.dismiss()
+
+<Tela>:
+    canvas.before:
+        Color:
+            rgba: hex('#999999')
+        Rectangle:
+            pos: self.pos 
+            size: self.size
+    orientation: 'vertical'
+    BoxLayout:
+        size_hint_y: 0.2
+        Label:
+            text: 'escolha a segurança da senha'
+            color: 'black'
+    GridLayout:
+        padding: ('100dp','100dp','100dp','300dp')
+        cols: 5 
+        spacing: '15dp'
+        Button:
+            size_hint_y: None
+            height: '35dp'
+            size_hint_x: 0.1
+            text: 'nível 1'
+            background_color: 'black'
+            on_release: root.gerarum()
+        Button:
+            size_hint_y: None
+            height: '65dp'
+            size_hint_x: 0.2
+            text: 'nível 2'
+            background_color: 'black'
+            on_release: root.gerardois()
+        Button:
+            size_hint_y: None
+            height: '95dp'
+            size_hint_x: 0.3
+            text: 'nível 3'
+            background_color: 'black'
+            on_release: root.gerartres()
+        Button:
+            size_hint_y: None
+            height: '125dp'
+            size_hint_x: 0.4
+            text: 'nível 4'
+            background_color: 'black'
+            on_release: root.gerarquatro()
+        Button:
+            size_hint_y: None
+            height: '155dp'
+            size_hint_x: 0.5
+            text: 'nível 5'
+            background_color: 'black'
+            on_release: root.gerarcinco()
+""")
+class aplicativo(App):
+    def build(self):
+        return Tela()
+
+if __name__ == '__main__':
+    aplicativo().run()
